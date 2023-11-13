@@ -20,16 +20,22 @@ def app():
 
         try:
             cursor.callproc(procedure_name, [srn])
-            details = cursor.stored_results()
+            
+            # Fetch all the result sets (if any)
+            for result in cursor.stored_results():
+                # Get column names
+                column_names = [i[0] for i in result.description]
 
-            # Get column names
-            column_names = [i[0] for i in details.description]
+                # Create a DataFrame from the result
+                df = pd.DataFrame(result.fetchall(), columns=column_names)
+                
+                if not df.empty:
+                    conn.close()
+                    return df
 
-            # Create a DataFrame from the details
-            df = pd.DataFrame(details.fetchall(), columns=column_names)
             conn.close()
+            return pd.DataFrame()  # Return empty DataFrame if no results
 
-            return df
         except mysql.connector.Error as e:
             st.error(f"Error: {e}")
             return pd.DataFrame()
@@ -50,7 +56,7 @@ def app():
             else:
                 st.write('No details found.')
         else:
-            st.write('Please enter a SRN.')
+            st.write('Please enter an SRN.')
 
     # Button to fetch and display parent details
     if st.button('Get Parent Details'):
@@ -62,7 +68,7 @@ def app():
             else:
                 st.write('No details found.')
         else:
-            st.write('Please enter a SRN.')
+            st.write('Please enter an SRN.')
 
     # Button to fetch and display guardian details
     if st.button('Get Guardian Details'):
@@ -74,7 +80,7 @@ def app():
             else:
                 st.write('No details found.')
         else:
-            st.write('Please enter a SRN.')
+            st.write('Please enter an SRN.')
 
 if __name__ == '__main__':
     app()

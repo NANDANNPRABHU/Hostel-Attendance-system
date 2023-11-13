@@ -27,7 +27,7 @@ def app():
 
         # Define the SQL query to fetch absentees who are not in the attendance table for today
         student_query = f"""
-        SELECT s.SRN, s.name
+        SELECT s.SRN, s.name ,s.room_no
         FROM student_ s
         LEFT JOIN block b ON s.block_id = b.block_id
         WHERE b.warden_id = {warden_id}
@@ -90,7 +90,7 @@ def app():
         for index, row in absent_students_phone_df.iterrows():
             phone_number = row['phone']
             # Here, send the WhatsApp message using pywhatkit
-            pwk.sendwhatmsg(f"+91{phone_number}", "You were absent today. Please contact the warden.", 22,5)
+            pwk.sendwhatmsg(f"+91{phone_number}", "You were absent today for attendance. Please contact the warden before 10:15 without fail", 22,5)
             st.write(f"WhatsApp message sent to {phone_number}")
 
     # Close the database connection
